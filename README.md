@@ -1,6 +1,6 @@
 # UniApp UI 组件库介绍
 
-这是一个基于 [uni-app](https://uniapp.dcloud.io/) 开发的 **UI 组件仓库**。它旨在为开发者提供一套高质量、跨平台的 UI 组件，
+这是一个基于 [uni-app](https://uniapp.dcloud.io/) 开发的 **UI 组件仓库**。它旨在为开发者提供一套高质量、跨平台的 UI 组件。
 
 ---
 

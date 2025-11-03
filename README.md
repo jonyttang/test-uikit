@@ -1,37 +1,17 @@
 TUIKit 是基于 IM SDK 的一款 UI 组件库，可通过 UI 组件快速实现聊天、会话、搜索、关系链、群组等功能。本文介绍如何快速集成 TUIKit 并实现核心功能。
 
-精简版界面效果如下图所示：
-<table>
-<tr>
-<td rowspan="1" colSpan="1" >**聊天页面**</td>
-
-<td rowspan="1" colSpan="1" >**语音通话**</td>
-
-<td rowspan="1" colSpan="1" >**视频通话**</td>
-</tr>
-
-<tr>
-<td rowspan="1" colSpan="1" ><br>![](https://write-document-release-1258344699.cos.ap-guangzhou.tencentcos.cn/100027380991/d1ad9925ae4611f0a68e5254001c06ec.png)</td>
-
-<td rowspan="1" colSpan="1" ><br>![](https://write-document-release-1258344699.cos.ap-guangzhou.tencentcos.cn/100027380991/d1ded42bae4611f096c2525400454e06.png)</td>
-
-<td rowspan="1" colSpan="1" ><br>![](https://write-document-release-1258344699.cos.ap-guangzhou.tencentcos.cn/100027380991/3c9126d1ae6a11f0a68e5254001c06ec.png)</td>
-</tr>
-</table>
-
-
 ## 关键概念
 
 针对用户不同场景的诉求和体积要求，我们推出了多个版本的 UI 组件 ，您可以根据实际业务需求选择集成最适合的版本。
 <table>
 <tr>
-<td rowspan="1" colSpan="1" >**功能区分**</td>
+<td rowspan="1" colSpan="1" >功能区分</td>
 
-<td rowspan="1" colSpan="1" >**聊天组件（**[**精简版**](https://write.woa.com/#)**）**</td>
+<td rowspan="1" colSpan="1" >精简版</td>
 
-<td rowspan="1" colSpan="1" >**聊天组件（**[**标准版**](https://write.woa.com/document/190027819517927424)**）**</td>
+<td rowspan="1" colSpan="1" >标准版</td>
 
-<td rowspan="1" colSpan="1" >**聊天组件（**[**完整版**](https://write.woa.com/document/181259629517578240)**）**</td>
+<td rowspan="1" colSpan="1" >完整版</td>
 </tr>
 
 <tr>
@@ -177,11 +157,11 @@ TUIKit 是基于 IM SDK 的一款 UI 组件库，可通过 UI 组件快速实现
 <tr>
 <td rowspan="1" colSpan="1" >体积大小</td>
 
-<td rowspan="1" colSpan="1" >**0.2 MB**</td>
+<td rowspan="1" colSpan="1" >0.2 MB</td>
 
-<td rowspan="1" colSpan="1" >**0.51 MB**</td>
+<td rowspan="1" colSpan="1" >0.51 MB</td>
 
-<td rowspan="1" colSpan="1" >**1.30 MB**</td>
+<td rowspan="1" colSpan="1" >1.30 MB</td>
 </tr>
 </table>
 
@@ -191,7 +171,7 @@ TUIKit 是基于 IM SDK 的一款 UI 组件库，可通过 UI 组件快速实现
 
 - TypeScript / JavaScript （**TUIKit 使用 ts 语言开发，支持在 js 或者 ts 项目中集成**）
 
-- Vue2/Vue3
+- Vue3
 
 - sass（sass-loader 版本 ≤ 10.1.1）
 
@@ -231,9 +211,6 @@ npm i tuikit-atomicx-uniapp-wx@vue2
 
 2. 拷贝源码。
 
-
-   
-
 【MacOS 端】
 ``` bash
 mkdir -p ./TUIKit && cp -r node_modules/tuikit-atomicx-uniapp-wx/ ./TUIKit && cp node_modules/@trtc/call-engine-lite-wx/RTCCallEngine.wasm.br ./static
@@ -245,177 +222,7 @@ xcopy node_modules\tuikit-atomicx-uniapp-wx .\TUIKit /i /e
 xcopy node_modules\@trtc\call-engine-lite-wx\RTCCallEngine.wasm.br .\static
 ```
 
-
-### 步骤2：引入组件
-
-请将以下内容复制到 pages/index/index.vue 文件中。
-
-
-
-【Vue3】
-``` javascript
-<template>
-  <view class="container">
-    <div v-if="!showChat" class="simple-view">
-      <input style="width: 90%; height: 60px; font-size: 18px; padding: 0 15px;" v-model="userID"
-        :placeholder="isLoggedIn ? '输入对方ID' : '输入你的ID'" />
-      <button :style="{ backgroundColor: isLoggedIn ? '#07C160' : '#006EFF' }"
-        @click="isLoggedIn ? startChat() : handleLogin()">
-        {{ isLoggedIn ? '开始聊天' : '登录' }}
-      </button>
-    </div>
-
-    <div class="TUIChat">
-      <MessageList />
-      <MessageInput />
-    </div>
-  </view>
-</template>
-
-<script lang="ts" setup>
-import { ref } from 'vue';
-import MessageInput from '../../TUIKit/components/MessageInput/MessageInput.vue';
-import MessageList from '../../TUIKit/components/MessageList/MessageList.vue';
-import { useLoginState, useConversationListState } from '../../TUIKit';
-
-const userID = ref('');
-const isLoggedIn = ref(false);
-const showChat = ref(false)
-const { login } = useLoginState();
-const { setActiveConversation } = useConversationListState();
-
-const handleLogin = async () => {
-  // 必填信息
-  // 测试TUIKit时可以从腾讯云IM控制台获取userSig
-  // 生产环境部署请从您的服务器获取
-  // 查看文档：https://cloud.tencent.com/document/product/269/32688
-  await login({
-    userId: userID.value,
-    userSig: '',
-    sdkAppId: 0,
-  });
-  wx.$globalCallPagePath = 'TUIKit/components/CallView/CallView';
-  isLoggedIn.value = true;
-  userID.value = ''
-};
-
-const startChat = () => {
-  if (!userID.value) return;
-  const conversationID = `C2C${userID.value}`;
-  setActiveConversation(conversationID);
-  showChat.value = true
-};
-</script>
-
-<style scoped>
-.TUIChat {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-}
-</style>
-```
-
-【Vue2】
-``` javascript
-<template>
-  <view class="container">
-    <div v-if="!showChat" class="simple-view">
-      <input style="width: 90%; height: 60px; font-size: 18px; padding: 0 15px;" v-model="userID"
-        :placeholder="isLoggedIn ? '输入对方ID' : '输入你的ID'" />
-      <button :style="{ backgroundColor: isLoggedIn ? '#07C160' : '#006EFF' }"
-        @click="isLoggedIn ? startChat() : handleLogin()">
-        {{ isLoggedIn ? '开始聊天' : '登录' }}
-      </button>
-    </div>
-
-    <div v-else class="TUIChat">
-      <MessageList class="message-list" />
-      <MessageInput />
-    </div>
-  </view>
-</template>
-
-<script lang='ts'>
-// @ts-nocheck
-import MessageInput from '../../TUIKit/components/MessageInput/MessageInput.vue';
-import MessageList from '../../TUIKit/components/MessageList/MessageList.vue';
-import { useLoginState, useConversationListState } from '../../TUIKit';
-
-export default {
-  name: 'ChatContainer',
-  
-  components: {
-    MessageInput,
-    MessageList
-  },
-  
-  data() {
-    return {
-      userID: '',
-      isLoggedIn: false,
-      showChat: false
-    }
-  },
-  
-  methods: {
-    async handleLogin() {
-      const { login } = useLoginState();
-      
-      try {
-        // 必填信息
-        // 测试TUIKit时可以从腾讯云IM控制台获取userSig
-        // 生产环境部署请从您的服务器获取
-        // 查看文档：https://cloud.tencent.com/document/product/269/32688
-        await login({
-          userId: this.userID,
-          userSig: '',
-          sdkAppId: 0,
-        });
-        
-        // 设置全局通话页面路径
-        wx.$globalCallPagePath = 'TUIKit/components/CallView/CallView';
-        
-        this.isLoggedIn = true;
-        this.userID = '';
-      } catch (error) {
-        console.error('登录失败:', error);
-      }
-    },
-    
-    startChat() {
-      if (!this.userID) return;
-      
-      const { setActiveConversation } = useConversationListState();
-      const conversationID = `C2C${this.userID}`;
-      
-      setActiveConversation(conversationID);
-      this.showChat = true;
-    }
-  }
-}
-</script>
-
-<style lang="scss" scoped>
-.TUIChat {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-
-  .message-list {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>
-```
-
-### 步骤3：获取 SDKAppID、userID 和 userSig
+### 步骤2：获取 SDKAppID、userID 和 userSig
 
 > **注意：**
 > 
@@ -437,50 +244,7 @@ export default {
 
 
 ## 运行和测试
-
-### 步骤1：运行
-
 ![](https://write-document-release-1258344699.cos.ap-guangzhou.tencentcos.cn/100027131298/85f89e3d8c8411f0814e525400bf7822.png)
-
-
-### 步骤2：发送第一条消息
-
-![](https://write-document-release-1258344699.cos.ap-guangzhou.tencentcos.cn/100027380991/2c7181f4affd11f0bd1d5254001c06ec.jpeg)
-
-
-> **注意：**
-> 
-
-> **如果集成音视频通话功能，将增加 400KB 的体积增量**。
-> 
-
-
-### 步骤3：增加音视频通话（可选）
-<table>
-<tr>
-<td rowspan="1" colSpan="1" >功能</td>
-
-<td rowspan="1" colSpan="1" >音视频通话组件</td>
-</tr>
-
-<tr>
-<td rowspan="1" colSpan="1" >1v1 视频、音频通话</td>
-
-<td rowspan="1" colSpan="1" >✓</td>
-</tr>
-
-<tr>
-<td rowspan="1" colSpan="1" >全局监听来电</td>
-
-<td rowspan="1" colSpan="1" >✓</td>
-</tr>
-
-<tr>
-<td rowspan="1" colSpan="1" >呼叫/接听/拒绝/挂断</td>
-
-<td rowspan="1" colSpan="1" >✓</td>
-</tr>
-</table>
 
 
 #### 1. 开通服务
@@ -743,18 +507,6 @@ export default {
 </table>
 
 
-#### 4. 配置页面路由
-
-在 pages.json 文件注册全局监听页面。
-``` javascript
-	{
-	    "path": "TUIKit/components/CallView/CallView",
-		"style": {
-			"navigationBarTitleText": "uni-app"
-		}
-	}
-```
-
 ## 常见问题
 
 ### 如何移除音视频通话功能
@@ -782,12 +534,9 @@ export default {
 移除在 pages.json 中为音视频通话添加的全局页面监听配置。
 
 
-
-
 【选项一】
-``` json
-
-    // {
+``` bash
+  // {
 	//    "path": "TUIKit/components/CallView/CallView",
 	//	  "style": {
 	//		  "navigationBarTitleText": "uni-app"
